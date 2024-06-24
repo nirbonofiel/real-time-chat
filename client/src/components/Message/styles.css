@@ -1,0 +1,19 @@
+.messageContainer{
+    display: flex;
+    margin-top: 5px;
+}
+
+.userMessage{
+    flex-direction: row-reverse;
+    background-color: #1976d25c !important;
+}
+
+.messageTime{
+    align-self: end;
+    font-size: x-small;
+}
+
+.messageCard{
+    display: flex;
+    padding: 4px 8px;
+}
