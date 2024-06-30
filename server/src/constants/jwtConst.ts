@@ -1,0 +1,1 @@
+export const SERCRETKEY = '1234';
