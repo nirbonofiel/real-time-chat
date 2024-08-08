@@ -1,19 +1,21 @@
-.messageContainer{
+.messageContainer {
     display: flex;
     margin-top: 5px;
 }
 
-.userMessage{
-    flex-direction: row-reverse;
+.userMessage {
     background-color: #1976d25c !important;
 }
 
-.messageTime{
+
+.messageTime {
     align-self: end;
     font-size: x-small;
+    margin-right: 5px;
 }
 
-.messageCard{
+.messageCard {
     display: flex;
+    flex-direction: row-reverse;
     padding: 4px 8px;
 }

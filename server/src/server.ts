@@ -26,10 +26,12 @@ app.get('/protected', authenticateJWT, (req:any, res) => {
   });
 
 io.use((socket: any,next)=>{
-    const token = socket.handshake.auth.token;
+    const token = socket.handshake.auth.authToken;
+    console.log('token',token);
     if(token){
         jwt.verify(token,SERCRETKEY, (err:any ,user: any)=>{
             if(err){
+                console.log('tokenError:',err);
                 return next(new Error('Authentication error'));
             }
             socket.user = user;
@@ -44,10 +46,12 @@ io.use((socket: any,next)=>{
     socket.on('message',(data: {message: string, avatarUrl: string})=>{
         const timestamp = new Date().toISOString();
         const user = socket.user.username;
+        console.log('a user message: ',user.username);
         io.emit('message',{...data,user,timestamp});
     })
 
-    socket.on('typing',(user:string) =>{
+    socket.on('typing',() =>{
+        const user = socket.user.username;
         socket.broadcast.emit('typing',user);
     })
 

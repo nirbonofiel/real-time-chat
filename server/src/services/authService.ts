@@ -13,16 +13,17 @@ export class AuthService {
         if(!error.isEmpty()){
             return res.status(400).json({errors: error.array()});
         }
-        console.log('users: ', users);
         const {username, password} = req.body;
         const hashedPassword = await bcrypt.hash(password,10);
+
         if(users.find(u=>u.username === username)) {
             return res.status(400).json({message: 'User already exsists'});
         }
+        const userId = Date.now()
+        users.push({username:username, password: hashedPassword, id: userId});
+        const token = jwt.sign({ username, id: userId}, SERCRETKEY, {expiresIn: '1h'});
 
-        users.push({username:username, password: hashedPassword, id: Date.now()});
-        res.status(201).json({message: 'User registered successfully',users: users})
-
+        res.status(201).json({message: 'User registered successfully', token: token ,username: username})
     } 
 
     static async login(req:Request,res:Response){
@@ -39,6 +40,6 @@ export class AuthService {
         }
 
         const token = jwt.sign({ username, id: user.id}, SERCRETKEY, {expiresIn: '1h'});
-        res.json({token:token});
+        res.json({message: 'Login successfully', token: token , username: username});
     }
 }
