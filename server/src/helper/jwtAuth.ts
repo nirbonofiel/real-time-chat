@@ -1,6 +1,8 @@
 import {Request,Response} from 'express';
 import jwt from 'jsonwebtoken';
-import { SERCRETKEY } from '../constants/jwtConst';
+
+
+const JWT_SECRET = process.env.JWT_SECRET || '1234';
 
 
 export const authenticateJWT = (req:any,res:Response,next: any) => {
@@ -10,7 +12,7 @@ export const authenticateJWT = (req:any,res:Response,next: any) => {
         return res.sendStatus(403);
     }
 
-    jwt.verify(token, SERCRETKEY, (err:any, user: any)=> {
+    jwt.verify(token, JWT_SECRET, (err:any, user: any)=> {
         if(err){
             res.sendStatus(403);
         }

@@ -9,10 +9,13 @@ import { useAuth } from "../../context/AuthContext";
 const Chat: React.FC = () => {
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [typing, setTyping] = useState<string | null>(null);
-    const {authToken}:any = useAuth();
+    const {authToken, isTokenExpired, removeToken}:any = useAuth();
     const socketRef = useRef<Socket | null >(null);
 
     useEffect(() => {
+        if(isTokenExpired()){
+            removeToken();
+        }
         if(authToken){
             socketRef.current = io('http://localhost:5000',{
                 auth: {authToken}
@@ -20,15 +23,15 @@ const Chat: React.FC = () => {
             socketRef.current.on('message', (data: MessageType) => {
                 setMessages((prevMessages) => [...prevMessages, data]);
             })
-            
+
             socketRef.current.on('typing', (user: string) => {
                 setTyping(user);
             })
-            
+
             socketRef.current.on('stopTyping', () => {
                 setTyping(null);
             })
-            
+
             return () => {
                 socketRef.current?.off('message');
                 socketRef.current?.off('typing');
@@ -48,7 +51,7 @@ const Chat: React.FC = () => {
     }
 
     const handleTyping = (isTyping: boolean) => {
-        isTyping ? socketRef.current?.emit('typing', 'Nir') : socketRef.current?.emit('stopTyping');
+        isTyping ? socketRef.current?.emit('typing') : socketRef.current?.emit('stopTyping');
     }
 
     return (

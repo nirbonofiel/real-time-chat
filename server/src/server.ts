@@ -5,7 +5,11 @@ import {Server} from 'socket.io';
 import authRouter from './controllers/authController';
 import jwt from 'jsonwebtoken';
 import { authenticateJWT } from './helper/jwtAuth';
-import { SERCRETKEY } from './constants/jwtConst';
+import dotenv from 'dotenv';
+
+dotenv.config()
+
+const JWT_SECRET = process.env.JWT_SECRET || '1234';
 
 const app = express();
 const server = http.createServer(app);
@@ -29,7 +33,7 @@ io.use((socket: any,next)=>{
     const token = socket.handshake.auth.authToken;
     console.log('token',token);
     if(token){
-        jwt.verify(token,SERCRETKEY, (err:any ,user: any)=>{
+        jwt.verify(token,JWT_SECRET, (err:any ,user: any)=>{
             if(err){
                 console.log('tokenError:',err);
                 return next(new Error('Authentication error'));

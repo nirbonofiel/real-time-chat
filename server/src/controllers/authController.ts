@@ -9,4 +9,4 @@ const registerValidation = [body('username').isLength({min:2}),body('password').
 router.post('/register',registerValidation,AuthService.register);
 router.post('/login',AuthService.login);
 
-export default router; 
+export default router;
