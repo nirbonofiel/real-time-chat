@@ -5,10 +5,13 @@ import Register from './screens/Register/Register';
 import Login from './screens/Login/Login';
 
 function App() {
-  const { authToken,isRegister,isTokenExpired,removeToken} : any = useAuth();
+  const { authToken,isRegister,isTokenExpired,removeToken, initUsername} : any = useAuth();
   useEffect(() => {
     if(isTokenExpired()){
       removeToken();
+    }
+    if(authToken){
+      initUsername()
     }
   }, []);
   return (

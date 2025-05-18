@@ -3,6 +3,7 @@ import express from 'express';
 import http from 'http';
 import {Server} from 'socket.io';
 import authRouter from './controllers/authController';
+import userRouter from './controllers/userController';
 import jwt from 'jsonwebtoken';
 import { authenticateJWT } from './helper/jwtAuth';
 import dotenv from 'dotenv';
@@ -24,10 +25,15 @@ app.use(cors());
 app.use(express.json())
 
 app.use('/auth',authRouter);
+app.use('/users',userRouter);
 
 app.get('/protected', authenticateJWT, (req:any, res) => {
     res.json({ message: `Hello, ${req.user.username}!`, userId: req.user.id });
   });
+
+function getRoomName(userId1:string, userId2:string) {
+return [userId1, userId2].sort().join('-');
+}
 
 io.use((socket: any,next)=>{
     const token = socket.handshake.auth.authToken;
@@ -46,16 +52,28 @@ io.use((socket: any,next)=>{
     }
 }).on('connection',(socket:any)=> {
     console.log('a user connected');
+    const user = socket.user.username;
+    socket.on('joinRoom', ({ room,otherUsername }:any) => {
+        console.log(user)
+        const allowedRoom = getRoomName(user, otherUsername);
+        if (room === allowedRoom) {
+          socket.join(room);
+        }
+        // Optionally, notify others in the room
+        // io.to(room).emit('userJoined', { userId: socket.id });
+      });
 
-    socket.on('message',(data: {message: string, avatarUrl: string})=>{
+    socket.on('leaveRoom', ({ room }:any) => {
+        socket.leave(room);
+    });
+
+    socket.on('message',(data:any)=>{
         const timestamp = new Date().toISOString();
-        const user = socket.user.username;
-        console.log('a user message: ',user.username);
-        io.emit('message',{...data,user,timestamp});
+        const { room } = data;
+        io.to(room).emit('message',{...data,user,timestamp});
     })
 
     socket.on('typing',() =>{
-        const user = socket.user.username;
         socket.broadcast.emit('typing',user);
     })
 
